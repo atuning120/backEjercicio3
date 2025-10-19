@@ -1,0 +1,52 @@
+# Archivos y directorios a ignorar en el contexto de Docker
+
+# Directorio target de Maven
+target/
+!target/*.jar
+
+# Archivos de configuración de IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Variables de entorno locales
+.env
+.env.local
+
+# Archivos temporales
+*.tmp
+*.temp
+
+# Cache de Maven
+.m2/
+
+# Archivos de Git
+.git/
+.gitignore
+
+# Documentación
+README.md
+*.md
+
+# Docker files (evitar recursión)
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# Archivos de backup
+*.bak
+*.swp
+*.swo
+
+# Node modules (si hay)
+node_modules/

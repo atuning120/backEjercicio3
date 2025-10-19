@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  # Aplicación Spring Boot Backend para testing con BD externa
+  backend:
+    build: 
+      context: ./backArquitectura
+      dockerfile: Dockerfile
+    container_name: backend-app
+    restart: unless-stopped
+    environment:
+      # Variables de entorno para Render (usar .env file para testing local)
+      SPRING_PROFILES_ACTIVE: render
+      PORT: ${PORT:-8080}
+      DATABASE_URL: ${DATABASE_URL:-jdbc:postgresql://localhost:5432/testdb}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+      MERCADOPAGO_ACCESS_TOKEN: ${MERCADOPAGO_ACCESS_TOKEN}
+      
+      # Configuración JVM
+      JAVA_OPTS: "-Xmx512m -Xms256m"
+    ports:
+      - "${PORT:-8080}:${PORT:-8080}"
+    volumes:
+      - ./logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${PORT:-8080}/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # PostgreSQL para desarrollo local (opcional - solo para testing)
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: testdb
+      POSTGRES_USER: testuser
+      POSTGRES_PASSWORD: testpass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    profiles: ["dev"]  # Solo se ejecuta con: docker-compose --profile dev up
+
+# Volumes persistentes
+volumes:
+  postgres_data:
+    driver: local

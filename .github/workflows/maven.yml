@@ -1,0 +1,49 @@
+# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
+
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: Java CI with Maven
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      SPRING_PROFILES_ACTIVE: test
+      DB_HOST_LOCAL: localhost
+      DB_NAME_LOCAL: back_arquitectura
+      DB_USER_LOCAL: postgres
+      DB_PASSWORD_LOCAL: password
+      FRONT_URI: http://localhost:5173
+      FRONT_URI_ALTERNATIVE: http://127.0.0.1:5173
+      PORT: 8080
+      DATABASE_URL: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build with Maven (skip tests)
+        working-directory: backArquitectura
+        run: mvn -B clean package -DskipTests
+
+      - name: Run tests (with H2)
+        working-directory: backArquitectura
+        run: mvn -B test
